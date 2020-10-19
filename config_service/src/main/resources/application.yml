@@ -1,0 +1,27 @@
+server:
+  port: 9200
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://gitee.com/nuanfeng_wangchao/config2.git
+  rabbitmq:
+    addresses: 127.0.0.1
+    username: guest
+    password: guest
+#暴露一个动态刷新的断点,访问后动态刷新
+management:
+  endpoints:
+    web:
+      exposure:
+        include: bus-refresh
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8000/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id:  ${spring.cloud.client.ip-address}:${server.port}

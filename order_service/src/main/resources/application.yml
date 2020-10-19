@@ -1,0 +1,91 @@
+server:
+  port: 9002
+spring:
+  application:
+    name: service-order
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+    username: root
+    password: root
+  jpa:
+    database: MySQL
+    show-sql: true
+    open-in-view: true
+  #zipkin使用rabbitmq采集数据
+  zipkin:
+    #base-url: http://localhost:9411/      #server的请求地址
+    sender:
+     #type: web     #数据的传输方式,以Http的形式向server端发送数据
+      type: rabbit
+  sleuth:
+    sampler:
+      probability: 1   #采样比   收集所有的数据
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    listener:   #配置重试策略
+      direct:
+        retry:
+          enabled: true
+      simple:
+        retry:
+          enabled: true
+
+eureka:
+  client:
+    service-url:
+     #defaultZone: http://localhost:9000/eureka/,http://localhost:8000/eureka/  #注册多个euraka
+      defaultZone: http://localhost:8000/eureka/
+  instance:
+    prefer-ip-address: true     #使用ip地址注册,方便eureka后台查看
+
+  #ribbon调用注册服务方负载均衡策略   服务名-     ribbon     NFLoadBalancerRuleClassName
+service-order:
+    ribbon:
+      # NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+      ConnectTimeout: 250       #ribbon连接超时时间
+      ReadTimeout: 1000         #ribbon数据读取时间
+      OkToRetryOnAllOperations: true    #是否对所有操作都进行重试
+      MaxAutoRetriesNextServer: 1     #切换实例的重试次数
+      MaxAutoRetries: 1             #对当前实例的重试次数
+
+#配置feign日志输出
+#日志级别,NONE:不输出日志,   BASIC:适用于生产环境追踪
+#HEADERS:BASIC基础上记录请求头和响应头信息  FULL:记录所有
+feign:
+  client:
+    config:
+      service-user:           #输出那个服务的日志
+        loggerLevel: FULL
+  hystrix:
+    enabled: true     #Feign对hystrix支持,所以启动类不需要@EnableHystrix
+#针对某个类的日志级别
+logging:
+  level:
+    root: info
+    org.example.feign.UserFeignClient: debug
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+    org.springframework.cloud.sleuth: DEBUG
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 3000    #设置连接超时时间,超过则降级
+      circuitBreaker:
+        requestVolumeThreshold: 5      #触发熔断的最小请求数,默认20/10秒
+        sleepWindowInMilliseconds: 10000  #熔断多少秒后去尝试请求 默认5,拒绝请求到再次尝试请求的时间间隔。
+        errorThresholdPercentage: 50  #触发熔断的失败请求最小占比,默认50%
+
+
+
+#暴露hystrix控制台接口
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

@@ -1,0 +1,39 @@
+server:
+  port: 9003
+spring:
+  application:
+    name: service-cart
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+    username: root
+    password: root
+  jpa:
+    database: MySQL
+    show-sql: true
+    open-in-view: true
+  cloud:
+    consul:
+      host: 127.0.0.1       #consul服务地址
+      port: 8500            #consule服务端口
+      discovery:
+        register: true      #是否需要注册
+        instance-id: ${spring.application.name}-1     #注册的实例ID(全局唯一)
+        server-name: ${spring.application.name}       #服务名称
+        port: ${server.port}                          #服务请求端口
+        prefer-ip-address: true                       #指定开启ip地址注册,而不是DNS
+        ip-address: ${spring.cloud.client.ip-address} #当前服务的请求ip
+    sentinel:
+      transport:
+        dashboard: localhost:8080     #配置sentinel控制台的请求地址
+      datasource:
+        ds1:
+          file:
+            file: classpath:flowrule.json
+            data-type: json
+            rule-type: flow
+      eager: true     #启动后立即加载,熔断信息,而不是调用才加载
+#激活对sentinel的支持
+feign:
+  sentinel:
+    enabled: true

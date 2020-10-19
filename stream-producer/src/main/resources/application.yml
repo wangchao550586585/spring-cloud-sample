@@ -1,0 +1,21 @@
+server:
+  port: 7002
+spring:
+  application:
+    name: stream-comsumer
+  rabbitmq:
+    addresses: 127.0.0.1
+    username: guest
+    password: guest
+  cloud:
+    stream:
+      bindings:
+        #output:
+        myoutput:
+          destination: default
+          producer:
+            partition-key-expression: payload      #分区关键字
+            partition-count: 2  #分区大小
+      binders:    #配置绑定器
+        defaultRabbit:
+          type: rabbit

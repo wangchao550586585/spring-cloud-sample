@@ -1,0 +1,24 @@
+server:
+  port: 7003
+spring:
+  application:
+    name: stream-comsumer
+  rabbitmq:
+    addresses: 127.0.0.1
+    username: guest
+    password: guest
+  cloud:
+    stream:
+      bindings:
+        myinput:
+          destination: default
+          group: group1
+          consumer:
+            partitioned: true  #开启分区支持
+      binders:
+          defaultRabbit:
+            type: rabbit
+      instance-count: 2   #消费者总数
+      instance-index: 1    #当前消费者索引
+
+

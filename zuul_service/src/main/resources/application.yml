@@ -1,0 +1,22 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: service-zuul
+#路由配置
+zuul:
+  routes:
+    #service-order: #路由id,随便定义
+      #path: /service-order/**     #映射路径       localhost:8080/service-order/a/b/c
+      #url:  http://127.0.0.1:9002   #映射路径对应的实际微服务url地址  http://127.0.0.1:9002/a/b/c
+      #serviceId: service-order      #配置转发的微服务的服务名称,配置eureka上面的
+    #如果路由id和serviceId一致,可简化配置
+    service-order: /service-order/**
+    #zuul默认路由配置
+    #如果当前微服务名称为:service-order ,默认的请求映射路径 /service-order/**
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8000/eureka/
+  instance:
+    prefer-ip-address: true
