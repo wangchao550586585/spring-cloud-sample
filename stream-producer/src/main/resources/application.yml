@@ -4,9 +4,10 @@ spring:
   application:
     name: stream-comsumer
   rabbitmq:
-    addresses: 127.0.0.1
-    username: guest
-    password: guest
+    addresses: 192.168.0.6
+    username: yokea
+    password: 123456
+    port: 5672
   cloud:
     stream:
       bindings:
